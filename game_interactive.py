@@ -107,7 +107,7 @@ class Player:
         return True
 
     def is_playing(self):
-        return self.is_playing
+        return self.playing
     
     def add_to_hand(self, card: Card):
         return self.hands[self.hand_idx].add_to_hand(card)
@@ -116,6 +116,7 @@ class Player:
         self.hands = [Hand()]
         self.hand_idx = 0
         self.doubled = False
+        self.playing = True if self.money > 0 else False
 
     def hit(self, card: Card):
         if not self.playing:
@@ -125,8 +126,10 @@ class Player:
         time.sleep(1)
         if bust:
             print(f'Player\'s hand number {self.hand_idx + 1} went bust. Player loses {self.bet} money. Player dumb.')
-            self.money -= self.bet
-            self.playing = False
+            self.hand_idx += 1
+            if self.hand_idx >= len(self.hands):
+                self.hand_idx = 0
+                self.playing = False
         if self.doubled:
             self.stand()
     
@@ -165,6 +168,9 @@ class Dealer:
 
     def deal(self, show=True):
         return self.deck.draw(show)
+
+    def reset(self):
+        self.hand = Hand()
     
     def play(self):
         showed = self.hand.reveal()
@@ -198,36 +204,42 @@ class Game:
         self.dealer.add_to_hand(self.dealer.deal(False))
 
     def play_round(self):
+        print(f'-------------------- ROUND START --------------------')
         for player in self.players:
-            player.hands = [Hand([Card('♠', 'A'), Card('♠', 'A')])]
-            player.bet = int(input('Place your bet: '))
+            player.bet = int(input(f'Place your bet, Player {player.id}: '))
         self.setup()
-        for player in self.players:
-            player.hands = [Hand([Card('♠', 'A'), Card('♠', 'A')])]
         print(f'Dealer hand is {self.dealer.hand}.')
         for player in self.players:
             print(f'Player {player.id}\'s hand is {player.hands}')
         time.sleep(2)
         for player in self.players:
+            print(f'-------------------- PLAYER {player.id}\'S TURN --------------------')
             playing = True
             while playing:
                 playing = player.play(None, self.dealer.deal())
+        print(f'-------------------- DEALING TIME --------------------')
         dealer_score = self.dealer.play()
         for player in self.players:
             for hand in player.hands:
                 showed = hand.reveal()
                 if showed:
                     print(f'Player hand after revealing card(s) is {hand}')
-                if hand.compute_value() > dealer_score:
+                value = hand.compute_value()
+                if value < 21 and value > dealer_score:
                     player.money += player.bet
                     print(f'Player {player.id} made {player.bet} bucks! Player now has {player.money} money left.')
-                elif hand.compute_value() == dealer_score:
+                elif value < 21 and value == dealer_score:
                     print(f'Player {player.id} stood.')
                 else:
                     player.money -= player.bet
                     print(f'Player {player.id} lost {player.bet} bucks! Player now has {player.money} money left.')
             time.sleep(1)
+        for player in self.players:
+            player.reset()
+        self.dealer.reset()
+        print(f'-------------------- ROUND END --------------------')
 
 if __name__ == '__main__':
-    game = Game()
-    game.play_round()
+    game = Game(2)
+    for _ in range(2):
+        game.play_round()
