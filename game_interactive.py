@@ -10,6 +10,9 @@ class Card:
         self.value = value
         self.show = show
 
+    def __eq__(self, other):
+        return self.value == other.value
+
     def __str__(self):
         return f'{self.suit} {self.value}' if self.show else 'X'
     
@@ -64,7 +67,7 @@ class Hand:
                 continue
             value_high += min(1 + VALUES.index(card.value), 10)
             value_low += min(1 + VALUES.index(card.value), 10)
-        self.value = value_high if value_high < 21 else value_low
+        self.value = value_high if value_high <= 21 else value_low
         return self.value
     
     def __str__(self):
@@ -87,18 +90,17 @@ class Player:
         if not self.playing:
             print(f'Player {self.id} is not playing.')
             return False
-        print(f'Player {self.id} is about to play.')
+        print(f'Player {self.id} is about to play on hand {self.hands[self.hand_idx]}.')
         move = input('Press h to hit, x to split, s to stay and d to double: ')
         match move:
             case 'h':
                 self.hit(card)
             case 'd':
-                print('here')
                 self.double()
                 card.show = False
                 self.hit(card)
             case 'x':
-                self.split(card)
+                self.split()
             case 's':
                 self.stand()
         time.sleep(1)
@@ -135,14 +137,15 @@ class Player:
             self.hand_idx = 0
             self.playing = False
 
-    def split(self, idx=-1):
+    def split(self):
         if not self.playing:
             return
         current_hand = self.hands[self.hand_idx]
         if len(current_hand.cards) == 2 and current_hand.cards[0] == current_hand.cards[1]:
             print(f'Player {self.id} is splitting...')
-            card = self.hands.pop(idx).cards[0]
+            card = self.hands.pop(self.hand_idx).cards[0]
             self.hands.extend([Hand([card]), Hand([card])])
+            print(f'Player {self.id}\'s new hand is {self.hands}.')
         else:
             print('Can not split.')
     
@@ -196,8 +199,11 @@ class Game:
 
     def play_round(self):
         for player in self.players:
+            player.hands = [Hand([Card('♠', 'A'), Card('♠', 'A')])]
             player.bet = int(input('Place your bet: '))
         self.setup()
+        for player in self.players:
+            player.hands = [Hand([Card('♠', 'A'), Card('♠', 'A')])]
         print(f'Dealer hand is {self.dealer.hand}.')
         for player in self.players:
             print(f'Player {player.id}\'s hand is {player.hands}')
