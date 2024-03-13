@@ -1,6 +1,17 @@
 # blackjack-agent
 Blackjack Agent
 
+## Setup
+
+In the root directory, run
+```
+python3.9 -m venv venv
+source venv/bin/activate
+```
+Now inside the virtual environment, run
+```
+pip install -r requirements.txt
+```
 
 ## Strategy 1: Perfect Basic Strategy
 
