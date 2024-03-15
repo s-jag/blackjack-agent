@@ -97,19 +97,9 @@ class Player:
             print(f'Player {self.id} is not playing.')
             return False
         print(f'Player {self.id} is about to play on hand {self.hands[self.hand_idx]}.')
-        move = input('Press h to hit, x to split, s to stay and d to double: ')
-        if move == 'h':
-            self.hit(card)
-        elif move == 'd':
-            self.double()
-            card.show = False
-            self.hit(card)
-        elif move == 'x':
-            self.split()
-        elif move == 's':
-            self.stand()
-        time.sleep(1)
-        return True
+        dealer_value = dealer_hand.cards[0].value
+        current_value = [card.value for card in self.hands[self.hand_idx].cards]
+        # code this sahith
 
     def is_playing(self):
         return self.playing
