@@ -21,7 +21,7 @@ class Deck:
         one_deck = [Card(s, v) for s in SUITS for v in VALUES]
         self.cards = []
         for _ in range(number_of_decks):
-            self.cards += one_deck
+            self.cards += one_deck[:]
         random.shuffle(self.cards)
 
     def draw(self, show=True):
