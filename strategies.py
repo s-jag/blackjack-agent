@@ -1,4 +1,4 @@
-from game_simulator import Hand
+from game_core_entities import Hand
 from abc import ABC, abstractmethod
 from enum import Enum
 
@@ -8,25 +8,24 @@ class Actions(Enum):
     SPLIT = 'SPLIT'
     STAY = 'STAY'
 
-
 class BasicStrategy:
-    def __init__(self, player_hand: Hand, dealer_hand: Hand):
-        self.player_hand = player_hand
-        self.dealer_hand = dealer_hand
 
-    def is_soft_hand(self):
-        return any(card.value == 'A' for card in self.player_hand.cards) and self.player_hand.compute_value() + 10 <= 21
+    @staticmethod
+    def is_soft_hand(player_hand):
+        return any(card.value == 'A' for card in player_hand.cards) and player_hand.compute_value() + 10 <= 21
 
-    def is_pair(self):
-        return len(self.player_hand.cards) == 2 and self.player_hand.cards[0].value == self.player_hand.cards[1].value
+    @staticmethod
+    def is_pair(player_hand):
+        return len(player_hand.cards) == 2 and player_hand.cards[0].value == player_hand.cards[1].value
 
-    def optimal_move(self):
-        dealer_value = self.dealer_hand.compute_value()
-        hand_value = self.player_hand.compute_value()
+    @staticmethod
+    def optimal_move(player_hand: Hand, dealer_hand: Hand):
+        dealer_value = dealer_hand.compute_value()
+        hand_value = player_hand.compute_value()
 
         # Pair handling
-        if self.is_pair():
-            pair_value = self.player_hand.cards[0].value
+        if BasicStrategy.is_pair(player_hand):
+            pair_value = player_hand.cards[0].value
             if pair_value == 'A' or pair_value == '8':
                 return 'SPLIT'
             elif pair_value == '9' and dealer_value not in [7, 10, 11]:
@@ -39,7 +38,7 @@ class BasicStrategy:
                 return 'SPLIT'
 
         # Soft totals
-        if self.is_soft_hand():
+        if BasicStrategy.is_soft_hand(player_hand):
             if hand_value == 18:
                 return 'DOUBLE' if 2 <= dealer_value <= 6 else 'HIT' if dealer_value in [9, 10, 11] else 'STAND'
             if hand_value == 17:
@@ -63,6 +62,4 @@ class BasicStrategy:
             return 'HIT' if dealer_value in [2, 3, 7, 8, 9, 10, 11] else 'STAND'
         else:
             return 'HIT' if dealer_value >= 7 else 'STAND'
-
-
         return 'HIT'  
