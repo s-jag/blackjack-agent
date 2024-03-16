@@ -78,7 +78,7 @@ class Hand:
         return '[' + ', '.join(map(str, self.cards)) + ']'
 
 class Player:
-    def __init__(self, id:int, money=100, bet=1, strategy=None):
+    def __init__(self, id:int, money=2000, bet=1, strategy=None):
         self.hands = [Hand()]
         self.hand_idx = 0
         self.money = money

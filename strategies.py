@@ -63,3 +63,43 @@ class BasicStrategy:
         else:
             return 'HIT' if dealer_value >= 7 else 'STAND'
         return 'HIT'  
+
+
+class HiLoCardCountingStrategy:
+    def __init__(self, base_bet=1):
+        self.base_bet = base_bet
+        self.running_count = 0
+        self.true_count = 0
+        self.decks_in_game = 3  #as per the Deck class initialization
+        self.cards_seen = 0
+        self.bet_increase_factor = max(1, self.true_count)
+
+    def adjust_for_card(self, card):
+        if card.value in ['2', '3', '4', '5', '6']:
+            self.running_count += 1
+        elif card.value in ['10', 'J', 'Q', 'K', 'A']:
+            self.running_count -= 1
+        self.cards_seen += 1
+        self.update_true_count()
+
+    def update_true_count(self):
+        decks_remaining = max(self.decks_in_game - (self.cards_seen / 52), 1)
+        self.true_count = self.running_count / decks_remaining
+
+    def adjust_bet_based_on_count(self):
+        if self.true_count <= 1:
+            return self.base_bet
+        else:
+            return min(self.base_bet * self.bet_increase_factor, self.base_bet + self.true_count - 1)
+
+    def optimal_move(self, player_hand, dealer_hand):
+        # same as Basic strat for now
+        return BasicStrategy.optimal_move(player_hand, dealer_hand)
+    
+    def reset_count(self):
+        """
+        Resets the running count, true count, and cards seen to start fresh when a new deck is shuffled into play.
+        """
+        self.running_count = 0
+        self.true_count = 0
+        self.cards_seen = 0
