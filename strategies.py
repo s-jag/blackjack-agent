@@ -70,15 +70,16 @@ class HiLoCardCountingStrategy:
         self.base_bet = base_bet
         self.running_count = 0
         self.true_count = 0
-        self.decks_in_game = 3  #as per the Deck class initialization
+        self.decks_in_game = 6  #as per the Deck class initialization
         self.cards_seen = 0
         self.bet_increase_factor = max(1, self.true_count)
 
-    def adjust_for_card(self, card):
+
+    def adjust_for_card(self, card, running_count):
         if card.value in ['2', '3', '4', '5', '6']:
-            self.running_count += 1
+            running_count += 1
         elif card.value in ['10', 'J', 'Q', 'K', 'A']:
-            self.running_count -= 1
+            running_count -= 1
         self.cards_seen += 1
         self.update_true_count()
 

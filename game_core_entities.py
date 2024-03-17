@@ -17,7 +17,7 @@ class Card:
         return f'{self.suit} {self.value}' if self.show else 'X'
     
 class Deck:
-    def __init__(self, number_of_decks=3):
+    def __init__(self, number_of_decks=6):
         one_deck = [Card(s, v) for s in SUITS for v in VALUES]
         self.cards = []
         for _ in range(number_of_decks):
