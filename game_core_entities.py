@@ -100,6 +100,7 @@ class Player:
         current_hand = self.hands[self.hand_idx]
         if not self.strategy:
             return False
+        self.strategy.adjust_for_card(card)
         move = self.strategy.optimal_move(player_hand=current_hand, dealer_hand=dealer_hand)
         if move == 'HIT':
             self.hit(card)
@@ -117,6 +118,7 @@ class Player:
         return self.playing
     
     def add_to_hand(self, card: Card):
+        self.strategy.adjust_for_card(card)
         return self.hands[self.hand_idx].add_to_hand(card)
     
     def reset(self):
@@ -186,7 +188,7 @@ class Dealer:
 
 class Game:
     def __init__(self, num_players=1):
-        self.deck = Deck(3)
+        self.deck = Deck(6)
         self.players = [Player(id=id) for id in range(num_players)]
         self.dealer = Dealer(self.deck)
 
@@ -204,7 +206,7 @@ class Game:
             self.deck = Deck(3)
             self.dealer.deck = self.deck
         for player in self.players:
-            player.set_bet(1)
+            player.set_bet(player.strategy.adjust_bet_based_on_count())
         self.setup()
         for player in self.players:
             playing = True

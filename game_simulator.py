@@ -27,7 +27,10 @@ if __name__ == '__main__':
         
         # Adjust bets based on the current count
         for player in game.players:
+            # print(player.strategy.running_count)
+            player.strategy.update_true_count()
             player.set_bet(player.strategy.adjust_bet_based_on_count())
+            # print(player.strategy.adjust_bet_based_on_count())
         
         # Play a round
         game.play_round()
